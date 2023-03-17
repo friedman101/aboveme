@@ -7,14 +7,15 @@ from pytz import timezone
 from colorama import just_fix_windows_console, Fore, Back, Style
 
 def print_coverage(times, satellite_alt, timezone_str, yellow_altitude, green_altitude):
+    date_fmt = '%Y-%m-%d %H:%M'
     if timezone_str is None:
-        time_strings = [str(t.utc_datetime()) for t in times]
+        time_strings = [t.utc_datetime().strftime(date_fmt) for t in times]
     else:
         my_timezone = timezone(timezone_str)
-        time_strings = [str(t.astimezone(my_timezone)) for t in times]
+        time_strings = [t.astimezone(my_timezone).strftime(date_fmt) for t in times]
 
     time_str_lin = len(time_strings[0])
-    print_fmt = '%-' + str(time_str_lin) + 's %20s'
+    print_fmt = '%-' + str(time_str_lin) + 's %15s'
     print(Back.BLUE + print_fmt % ('Time', 'Altitude [deg]'), end='')
     print(Back.BLACK)
     for time_string, alt in zip(time_strings, satellite_alt):
@@ -24,7 +25,7 @@ def print_coverage(times, satellite_alt, timezone_str, yellow_altitude, green_al
             color = Back.YELLOW
         else:
             color = Back.GREEN
-        print(color + '%s %20.2f' % (time_string, alt), end='')
+        print(color + '%s %15.2f' % (time_string, alt), end='')
         print(Back.BLACK)
 
 def propagate(satellites, lat, lon, propagation_time, dt):
