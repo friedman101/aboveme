@@ -39,8 +39,8 @@ To see what the OneWeb coverage over Seattle for the next 5 hours looks like (in
 ```
 
 You'll see something like this:
-<img src="https://github.com/friedman101/whatsup/blob/main/pics/oneweb.png?raw=true" alt="oneweb coverage" width="300"/>
 
+<img src="https://github.com/friedman101/whatsup/blob/main/pics/oneweb.png?raw=true" alt="oneweb coverage" width="400"/>
 
 
 To see what the Starlink coverage over Seattle for the next 5 hours looks like (in 15 minute increments):
