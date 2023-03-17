@@ -6,7 +6,7 @@ import numpy as np
 from pytz import timezone
 from colorama import just_fix_windows_console, Fore, Back, Style
 
-def print_coverage(times, satellite_alt, timezone_str, yellow_altitude, green_altitude):
+def print_coverage(times, satellite_alt, satellite_name, timezone_str, yellow_altitude, green_altitude):
     date_fmt = '%Y-%m-%d %H:%M'
     if timezone_str is None:
         time_strings = [t.utc_datetime().strftime(date_fmt) for t in times]
@@ -15,17 +15,17 @@ def print_coverage(times, satellite_alt, timezone_str, yellow_altitude, green_al
         time_strings = [t.astimezone(my_timezone).strftime(date_fmt) for t in times]
 
     time_str_lin = len(time_strings[0])
-    print_fmt = '%-' + str(time_str_lin) + 's %15s'
-    print(Back.BLUE + print_fmt % ('Time', 'Altitude [deg]'), end='')
+    print_fmt = '%-' + str(time_str_lin) + 's %15s %15s'
+    print(Back.BLUE + print_fmt % ('Time', 'Satellite Name', 'Altitude [deg]'), end='')
     print(Back.BLACK)
-    for time_string, alt in zip(time_strings, satellite_alt):
+    for time_string, name, alt in zip(time_strings, satellite_name, satellite_alt):
         if alt < yellow_altitude:
             color = Back.RED
         elif alt < green_altitude:
             color = Back.YELLOW
         else:
             color = Back.GREEN
-        print(color + '%s %15.2f' % (time_string, alt), end='')
+        print(color + '%s %15s %15.2f' % (time_string, name, alt), end='')
         print(Back.BLACK)
 
 def propagate(satellites, lat, lon, propagation_time, dt):
@@ -37,15 +37,18 @@ def propagate(satellites, lat, lon, propagation_time, dt):
     times = np.arange(start_time, end_time, dt/3600/24)
     times_tt = np.array([t.tt for t in times])
     satellite_alt = np.zeros(len(times))
+    satellite_name = ['']*len(times)
 
     for i in range(len(times)):
         time = times[i]
         for satellite in satellites:
             difference = satellite - here
             alt, az, distance = difference.at(time).altaz()
-            satellite_alt[i] = max(satellite_alt[i], alt.degrees)
+            if alt.degrees > satellite_alt[i]:
+                satellite_alt[i] = alt.degrees
+                satellite_name[i] = satellite.name
 
-    return times, satellite_alt
+    return times, satellite_alt, satellite_name
 
 parser = argparse.ArgumentParser()
 parser.add_argument('time_hours', help='time in hours (default 12)', default=12, nargs='?', type=float)
@@ -74,5 +77,5 @@ if args.iss:
     by_name = {sat.name: sat for sat in satellites}
     satellites = [by_name['ISS (ZARYA)']]
 
-times, satellite_alt = propagate(satellites, args.lat, args.lon, args.time_hours*3600, args.dt_mins*60)
-print_coverage(times, satellite_alt, args.timezone, args.yellow_altitude, args.green_altitude)
+times, satellite_alt, satellite_name = propagate(satellites, args.lat, args.lon, args.time_hours*3600, args.dt_mins*60)
+print_coverage(times, satellite_alt, satellite_name, args.timezone, args.yellow_altitude, args.green_altitude)
