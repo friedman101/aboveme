@@ -32,16 +32,20 @@ optional arguments:
                         satellite altitude to color green (default 70)
 ```
 
-To see what the Starlink coverage over Seattle for the next 5 hours looks like (in 15 minute increments):
-
-```
-./whatsup.py 5 15 47.608013 -122.335167 --starlink --timezone US/Pacific
-```
-
 To see what the OneWeb coverage over Seattle for the next 5 hours looks like (in 15 minute increments):
 
 ```
 ./whatsup.py 5 15 47.608013 -122.335167 --oneweb --timezone US/Pacific
+```
+
+You'll see something like this:
+![oneweb coverage](https://github.com/friedman101/whatsup/blob/main/pics/oneweb.png?raw=true)
+
+
+To see what the Starlink coverage over Seattle for the next 5 hours looks like (in 15 minute increments):
+
+```
+./whatsup.py 5 15 47.608013 -122.335167 --starlink --timezone US/Pacific
 ```
 
 To see when the ISS is over Seattle for the next 5 hours looks like (in 15 minute increments):
