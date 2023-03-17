@@ -10,6 +10,28 @@ pip install -r requirements.txt
 
 ## Usage
 
+```
+usage: whatsup.py [-h] [--oneweb] [--starlink] [--iss] [--timezone TIMEZONE] [--yellow_altitude YELLOW_ALTITUDE] [--green_altitude GREEN_ALTITUDE]
+                  [time_hours] [dt_mins] [lat] [lon]
+
+positional arguments:
+  time_hours            time in hours (default 12)
+  dt_mins               time period in minutes (default 15)
+  lat                   latitude in degrees (default Seattle, WA)
+  lon                   longitude in degrees (default Seattle, WA)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --oneweb              oneweb satellites
+  --starlink            starlink satellites
+  --iss                 iss
+  --timezone TIMEZONE   timezone for plotting (default is UTC)
+  --yellow_altitude YELLOW_ALTITUDE
+                        satellite altitude to color yellow (default 55)
+  --green_altitude GREEN_ALTITUDE
+                        satellite altitude to color green (default 70)
+```
+
 To see what the Starlink coverage over Seattle for the next 5 hours looks like (in 15 minute increments):
 
 ```
