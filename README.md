@@ -1,6 +1,12 @@
 # `whatsup.py`
 
-Simple tool to show what your satellite coverage in the near future. It looks at all satellites visible from your current location, and chooses the one highest in the sky. When you run the tool it pulls the latest TLEs from [Celestrak](https://celestrak.org/), and propagates the satellite orbits using [Skyfield](https://rhodesmill.org/skyfield/).
+Simple tool to show your satellite coverage in the near future. It looks at satellite(s) visible from your current location, and chooses the one highest in the sky. When you run the tool it pulls the latest TLEs from [Celestrak](https://celestrak.org/), and propagates the satellite orbits using [Skyfield](https://rhodesmill.org/skyfield/).
+
+## Install Requirements
+
+```
+pip install -r requirements.txt
+```
 
 ## Usage
 
