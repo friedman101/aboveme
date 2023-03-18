@@ -5,10 +5,21 @@ from skyfield.api import load, wgs84
 import numpy as np
 from pytz import timezone
 from colorama import just_fix_windows_console, Fore, Back, Style
+import requests
+import urllib.parse
+from timezonefinder import TimezoneFinder
+
+def latlontz_from_city(city):
+    url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(city) +'?format=json'
+    response = requests.get(url).json()
+    lat = float(response[0]['lat'])
+    lon = float(response[0]['lon'])
+    tz = TimezoneFinder().timezone_at(lat=lat,lng=lon)
+    return lat, lon, tz
 
 def print_coverage(times, satellite_alt, satellite_name, timezone_str, yellow_altitude, green_altitude):
     date_fmt = '%Y-%m-%d %H:%M'
-    if timezone_str is None:
+    if timezone_str == 'UTC':
         time_strings = [t.utc_datetime().strftime(date_fmt) for t in times]
     else:
         my_timezone = timezone(timezone_str)
@@ -53,12 +64,11 @@ def propagate(satellites, lat, lon, propagation_time, dt):
 parser = argparse.ArgumentParser()
 parser.add_argument('time_hours', help='time in hours (default 12)', default=12, nargs='?', type=float)
 parser.add_argument('dt_mins', help='time period in minutes (default 15)', default=15, nargs='?', type=float)
-parser.add_argument('lat', help='latitude in degrees (default Seattle, WA)', default=47.608013, nargs='?', type=float)
-parser.add_argument('lon', help='longitude in degrees (default Seattle, WA)', default=-122.335167, nargs='?', type=float)
+parser.add_argument('city', help='city name (default Seattle, WA)', default='Seattle, WA', nargs='?', type=str)
 parser.add_argument('--oneweb', help='oneweb satellites', action='store_true')
 parser.add_argument('--starlink', help='starlink satellites', action='store_true')
 parser.add_argument('--iss', help='iss', action='store_true')
-parser.add_argument('--timezone', help='timezone for plotting (default is UTC)', default=None, type=str)
+parser.add_argument('--utc', help='use UTC time instead of local time', action='store_true')
 parser.add_argument('--yellow_altitude', help='satellite altitude to color yellow (default 55)', default=55.0, type=float)
 parser.add_argument('--green_altitude', help='satellite altitude to color green (default 70)', default=70.0, type=float)
 args = parser.parse_args()
@@ -77,5 +87,8 @@ if args.iss:
     by_name = {sat.name: sat for sat in satellites}
     satellites = [by_name['ISS (ZARYA)']]
 
-times, satellite_alt, satellite_name = propagate(satellites, args.lat, args.lon, args.time_hours*3600, args.dt_mins*60)
-print_coverage(times, satellite_alt, satellite_name, args.timezone, args.yellow_altitude, args.green_altitude)
+lat, lon, tz = latlontz_from_city(args.city)
+if args.utc:
+    tz = 'UTC'
+times, satellite_alt, satellite_name = propagate(satellites, lat, lon, args.time_hours*3600, args.dt_mins*60)
+print_coverage(times, satellite_alt, satellite_name, tz, args.yellow_altitude, args.green_altitude)

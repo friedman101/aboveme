@@ -1,4 +1,6 @@
 colorama==0.4.6
 numpy==1.21.5
 pytz==2022.7
+requests==2.27.1
 skyfield==1.45
+timezonefinder==6.1.9
