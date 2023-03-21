@@ -8,6 +8,7 @@ from colorama import just_fix_windows_console, Fore, Back, Style
 import requests
 import urllib.parse
 from timezonefinder import TimezoneFinder
+import termplotlib as tpl
 
 def latlontz_from_city(city):
     url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(city) +'?format=json'
@@ -17,7 +18,15 @@ def latlontz_from_city(city):
     tz = TimezoneFinder().timezone_at(lat=lat,lng=lon)
     return lat, lon, tz
 
-def print_coverage(times, satellite_alt, satellite_name, timezone_str, yellow_altitude, green_altitude):
+def plot_coverage(times, satellite_alt):
+    time_hours = np.array([t.tt for t in times])
+    time_hours = time_hours*24
+    time_hours -= time_hours[0]
+    fig = tpl.figure()
+    fig.plot(time_hours,satellite_alt,xlabel='time [hr]',title='altitude [deg]')
+    fig.show()
+
+def print_coverage_table(times, satellite_alt, satellite_name, timezone_str, yellow_altitude, green_altitude):
     date_fmt = '%Y-%m-%d %H:%M'
     if timezone_str == 'UTC':
         time_strings = [t.utc_datetime().strftime(date_fmt) for t in times]
@@ -91,4 +100,5 @@ lat, lon, tz = latlontz_from_city(args.city)
 if args.utc:
     tz = 'UTC'
 times, satellite_alt, satellite_name = propagate(satellites, lat, lon, args.time_hours*3600, args.dt_mins*60)
-print_coverage(times, satellite_alt, satellite_name, tz, args.yellow_altitude, args.green_altitude)
+print_coverage_table(times, satellite_alt, satellite_name, tz, args.yellow_altitude, args.green_altitude)
+plot_coverage(times, satellite_alt)
