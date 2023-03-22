@@ -18,12 +18,22 @@ def latlontz_from_city(city):
     tz = TimezoneFinder().timezone_at(lat=lat,lng=lon)
     return lat, lon, tz
 
-def plot_coverage(times, satellite_alt):
-    time_hours = np.array([t.tt for t in times])
-    time_hours = time_hours*24
-    time_hours -= time_hours[0]
+def plot_coverage(times, satellite_alt, timezone_str):
+    date_fmt = '%H.%M'
+    if timezone_str == 'UTC':
+        time_strings = [t.utc_datetime().strftime(date_fmt) for t in times]
+    else:
+        my_timezone = timezone(timezone_str)
+        time_strings = [t.astimezone(my_timezone).strftime(date_fmt) for t in times]
+
+    # convert to fractional hours instead of hours.minutes
+    time_hours_mins = np.array([float(t) for t in time_strings])
+    time_hours = np.floor(time_hours_mins)
+    time_mins = (time_hours_mins - time_hours)
+    time_hours_frac = time_hours + time_mins*100/60
+
     fig = tpl.figure()
-    fig.plot(time_hours,satellite_alt,xlabel='time [hr]',title='altitude [deg]')
+    fig.plot(time_hours_frac,satellite_alt,xlabel='time [hr]',title='altitude [deg]')
     fig.show()
 
 def print_coverage_table(times, satellite_alt, satellite_name, timezone_str, yellow_altitude, green_altitude):
@@ -101,4 +111,4 @@ if args.utc:
     tz = 'UTC'
 times, satellite_alt, satellite_name = propagate(satellites, lat, lon, args.time_hours*3600, args.dt_mins*60)
 print_coverage_table(times, satellite_alt, satellite_name, tz, args.yellow_altitude, args.green_altitude)
-plot_coverage(times, satellite_alt)
+plot_coverage(times, satellite_alt, tz)
