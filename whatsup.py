@@ -31,6 +31,8 @@ def plot_coverage(times, satellite_alt, timezone_str):
     time_hours = np.floor(time_hours_mins)
     time_mins = (time_hours_mins - time_hours)
     time_hours_frac = time_hours + time_mins*100/60
+    # unwrap the hours, so [23 0 1] becomes [23 24 25]
+    time_hours_frac = np.unwrap(time_hours_frac, period=24)
 
     fig = tpl.figure()
     fig.plot(time_hours_frac,satellite_alt,xlabel='time [hr]',title='altitude [deg]')
@@ -55,7 +57,7 @@ def print_coverage_table(times, satellite_alt, satellite_name, timezone_str, yel
             color = Back.YELLOW
         else:
             color = Back.GREEN
-        print(color + '%s %15s %15.2f' % (time_string, name, alt), end='')
+        print(color + '%s %15s %15.1f' % (time_string, name, alt), end='')
         print(Back.BLACK)
 
 def propagate(satellites, lat, lon, propagation_time, dt):
