@@ -4,14 +4,14 @@ import argparse
 from skyfield.api import load, wgs84
 import numpy as np
 from pytz import timezone
-from colorama import just_fix_windows_console, Fore, Back, Style
+from colorama import init, deinit, Fore, Back, Style
 import requests
 import urllib.parse
 from timezonefinder import TimezoneFinder
 import termplotlib as tpl
 
 def latlontz_from_city(city):
-    url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(city) +'?format=json'
+    url = 'https://nominatim.openstreetmap.org/search?q=' + city +'&format=json'
     response = requests.get(url).json()
     lat = float(response[0]['lat'])
     lon = float(response[0]['lon'])
@@ -48,6 +48,7 @@ def print_coverage_table(times, satellite_alt, satellite_name, timezone_str, yel
 
     time_str_lin = len(time_strings[0])
     print_fmt = '%-' + str(time_str_lin) + 's %15s %15s'
+    init(autoreset=True)
     print(Back.BLUE + print_fmt % ('Time', 'Satellite Name', 'Altitude [deg]'), end='')
     print(Back.BLACK)
     for time_string, name, alt in zip(time_strings, satellite_name, satellite_alt):
